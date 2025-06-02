@@ -26,8 +26,7 @@ router.get("/allusers", GetallUsers);
 router.get("/get/:id", Getuser);
 
 router.get("/show", (req, res)=>{
-  res.sendFile(__dirname + "./index.html");
-  console.log("HTML file sent successfully", __dirname + "./index.html");
+  
   res.body = { message: "Image sent successfully" };
   res.status(200).json({ message: "Image sent successfully" });
 })
