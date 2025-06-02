@@ -12,7 +12,7 @@
 
 const express = require("express");
 const router = express.Router();
-const { Register, Getuser } = require("../logics/logics");
+const { Register, Getuser, GetallUsers } = require("../logics/logics");
 
 router.post("/register", Register);
 
@@ -20,6 +20,8 @@ router.get("/test", (req, res) => {
   res.send("Welcome to the API");
   req.body = { message: "Welcome to the API" };
 });
+
+router.get("/allusers", GetallUsers);
 
 router.get("/get/:id", Getuser);
 
