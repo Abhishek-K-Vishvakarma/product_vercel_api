@@ -22,31 +22,64 @@
 //   console.log("Server is running on port http://localhost:5000");
 // })
 
-require('dotenv').config({ path: '../.env' }); // ✅ Important for nested /api folder
+// require('dotenv').config({ path: '../.env' }); // ✅ Important for nested /api folder
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const serverless = require('serverless-http');
+// const router = require('../routes/router');
+
+// const app = express();
+// app.use(express.json());
+// mongoose.connect(process.env.MONGO_URI,{
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// }).then(() => {
+//   console.log("✅ MongoDB connected successfully.");
+// }).catch(err => {
+//   console.log("❌ MongoDB connection error: ", err);
+// });
+
+// app.use('/api', router);
+
+// module.exports.handler = serverless(app);
+
+// if (process.env.NODE_ENV !== 'production') {
+//   const PORT = process.env.PORT || 5000;
+//   app.listen(PORT, () => {
+//     console.log(`🚀 Server running locally at http://localhost:${ PORT }`);
+//   });
+// }
+
+
+
+require('dotenv').config({ path: '../.env' }); // load .env correctly from root
+
 const express = require('express');
 const mongoose = require('mongoose');
 const serverless = require('serverless-http');
-const router = require('../routes/router');
+const router = require('../routes/router'); // fix path if needed
 
 const app = express();
 app.use(express.json());
-mongoose.connect(process.env.MONGO_URI,{
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log("✅ MongoDB connected successfully.");
-}).catch(err => {
-  console.log("❌ MongoDB connection error: ", err);
-});
 
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected successfully."))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
+
+// Routes
 app.use('/api', router);
 
-module.exports.handler = serverless(app);
-
+// Local server (only runs locally)
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`🚀 Server running locally at http://localhost:${ PORT }`);
   });
 }
+
+// ✅ Required by Vercel (must export a function)
+module.exports = app;
+module.exports.handler = serverless(app);
+
 
