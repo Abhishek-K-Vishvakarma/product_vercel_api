@@ -57,9 +57,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const serverless = require('serverless-http');
 const router = require('../routes/router'); // fix path if needed
-
+const cors = require("cors");
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
