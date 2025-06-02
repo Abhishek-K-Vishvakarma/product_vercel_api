@@ -39,7 +39,7 @@ const Register = async (req, res) => {
 
 
 
-const Getuser = async()=>{
+const Getuser = async(req, res)=>{
   try{
    const id = req.params.id;
    console.log("id is :", id);
