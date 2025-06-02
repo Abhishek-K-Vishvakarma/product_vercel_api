@@ -37,4 +37,18 @@ const Register = async (req, res) => {
   }
 }
 
-module.exports = { Register };
+
+
+const Getuser = async()=>{
+  try{
+   const id = req.params.id;
+   console.log("id is :", id);
+  }catch(error){
+    res.status(500).json({
+      message : "Server Error :",
+      error : error.message
+    })
+  }
+}
+
+module.exports = { Register, Getuser };
