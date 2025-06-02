@@ -53,7 +53,6 @@
 
 
 require('dotenv').config({ path: '../.env' }); // load .env correctly from root
-
 const express = require('express');
 const mongoose = require('mongoose');
 const serverless = require('serverless-http');
