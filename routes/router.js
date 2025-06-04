@@ -55,5 +55,4 @@ router.get("/show", (req, res)=>{
   res.body = { message: "Image sent successfully" };
   res.status(200).json({ message: "Image sent successfully" });
 })
-
 module.exports = router;
