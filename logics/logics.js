@@ -26,13 +26,40 @@ const Product = require("../models/products");
 const ShippingAddress = require("../models/shippingAddress");
 const Order = require("../models/order");
 const Payment = require("../models/payment");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
+const genotp = ()=> Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit OTP
+const nodemailer = require("nodemailer");
+const users = {};
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user : "vishabhishek019@gmail.com",
+    pass: "djcj ozsn ybbt gwpu"
+  }
+})
 
 const Register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone, address, isVerified, gender} = req.body;
     const user = await User.findOne({ email });
     if (user) return res.status(404).json({ message: "User already exists!" });
-    const newUser = new User({ name, email, password });
+    const otp = genotp();
+    const expireOtp = Date.now() + 300000;
+    users[email] = {otp, expireOtp};
+    const mailOptions = {
+      from: "vishabhishek019@gmail.com",
+      to: email,
+      subject: "Welcome to Our Service : Send email for otp verify",
+      text: `Your otp is ${ otp }. Please verify your email to complete the registration process.`,
+    }
+    await transporter.sendMail(mailOptions);
+    console.log(`Your email is ${ email } and otp is : ${ otp }`);
+    const salt = await bcrypt.genSalt(10);
+    const hanshePassword = await bcrypt.hash(password, salt);
+    const newUser = new User({ name, email, password: hanshePassword, phone, address, isVerified, gender });
     const saveuser = await newUser.save();
     res.status(201).json({ message: "User registered successfully!", user: saveuser });
   } catch (error) {
@@ -43,6 +70,64 @@ const Register = async (req, res) => {
   }
 }
 
+const DeleteAllRegisterUsers = async(req, res)=>{
+   try{
+   const id = req.params.id;
+   if(!id) return res.status(404).json({message: "User ID not provided!"});
+   const user = await User.findByIdAndDelete(id);
+   if(!user) return res.status(404).json({message: "User not found!"});
+    res.status(200).json({message: "User deleted successfully!", status: "success", _id: `This is a Deleted user ID : ${id}`});
+   }catch(error){
+     res.status(500).json({ message: "Server error :", error: error.message });
+   }
+}
+
+const EmailVerify = async(req, res)=>{
+  try{
+    const {email, otp} = req.body;
+    const { otp: storedOtp, expireOtp } = users[email] || {};
+    if(!email || !otp) return res.status(400).json({message: "Email and OTP are required!"});
+    if(Date.now() > expireOtp) {
+       delete users[email]; // Clear OTP if email is not found
+       return res.status(404).json({message: "Otp has expired! Please try again."});
+    }
+
+    if(storedOtp == otp){
+       delete users[email]; 
+       return res.status(201).json({message: "Email verified successfully!"});
+    }
+    return res.status(404).json({message: "Invalid OTP! Please try again."});
+  }catch(error){
+    res.status(500).json({message : "Server error :", error : error.message});
+  }
+}
+
+const UserLogin = async(req, res)=>{
+  try{
+      const {email, password} = req.body;
+      const user = await User.findOne({email});
+      if(!user) return res.status(404).json({message : "User not found!"});
+      const isVerified = user.isVerified;
+      if(!isVerified) return res.status(403).json({message : "Please verify your email first!"});
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if(!passwordMatch) return res.status(401).json({message : "Invalid credentials!"});
+      const Secret_Key = "abhi_is_a_MERN_stack_developer"
+      const token = jwt.sign({ id: user._id }, Secret_Key, { expiresIn: '1h' });
+      res.status(201).json({message : "User Logged in successfully!", user : {
+        name : user.name,
+        email : user.email, 
+        password: user.password,
+        phone: user.phone,
+        address: user.address,
+        isVerified: user.isVerified,
+        gender: user.gender,
+        _id: user._id,
+        token: token
+       }})
+  }catch(error){
+    res.status(500).json({message : "Server error :", error : error.message});
+  }
+}
 
 
 const Getuser = async(req, res)=>{
@@ -71,6 +156,19 @@ const GetallUsers = async(req, res)=>{
     if (!users || users.length === 0) return res.status(404).json({ message: "No users found!" });
     res.status(200).json({ message: "Users fetched successfully!", data: users, status: "success" });
   } catch (error) {
+    res.status(500).json({
+      message: "Server Error :",
+      error: error.message
+    });
+  }
+}
+
+const UpdateUsers = async(req, res)=>{
+  try{
+      const user = await User.findByIdAndUpdate(req.params.id, {$set: req.body}, {new: true});
+      if(!user) return res.status(404).json({message: "User not found!"});
+      res.status(200).json({ message: "User updated successfully!", data : user, status: "Success" });
+  }catch(error){
     res.status(500).json({
       message: "Server Error :",
       error: error.message
@@ -131,12 +229,12 @@ const UpdateSubcategory = async(req, res)=>{
 
 const ProductCreate = async(req, res)=>{
   try{
-    const {name, description, price, subcategory_id} = req.body;
+    const {name, description, price, subcategory_id, quantity, color, size} = req.body;
     const subcategory = await Subcategory.findById(subcategory_id);
     if(!subcategory) return res.status(404).json({message: "Subcategory not found!"});
     const product = await Product.findOne({name});
     if(product) return res.status(404).json({message: "Product already exists!"});
-    const newProduct = new Product({ name, description, price, subcategory_id });
+    const newProduct = new Product({ name, description, price, subcategory_id, quantity, color, size });
     const savedProduct = await newProduct.save();
     res.status(201).json({ message: "Product created successfully!", product: savedProduct });
   }catch(error){
@@ -283,4 +381,6 @@ module.exports = { Register, Getuser, GetallUsers,
   UpdateSubcategory, getCategory, getSubcategory, 
   getProducts, UpdateProduct, ShippingAddressCreate, 
   OrderCreate, PaymentCreate, PaymentUpdate,
-  OrderGet };
+  OrderGet, UserLogin, EmailVerify, DeleteAllRegisterUsers,
+  UpdateUsers
+ };

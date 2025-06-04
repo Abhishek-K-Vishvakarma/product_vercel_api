@@ -16,11 +16,13 @@ const { Register, Getuser, GetallUsers, CategoryCreate,
   SubcategoryCreate, ProductCreate, UpdateSubcategory,
   getCategory, getSubcategory, getProducts,
   UpdateProduct, ShippingAddressCreate, OrderCreate,
-  PaymentCreate, PaymentUpdate, OrderGet
-
+  PaymentCreate, PaymentUpdate, OrderGet,
+  UserLogin, EmailVerify, DeleteAllRegisterUsers,
+  UpdateUsers
  } = require("../logics/logics");
 
 router.post("/register", Register);
+router.post("/login", UserLogin)
 
 router.get("/test", (req, res) => {
   res.send("Welcome to the API");
@@ -28,6 +30,7 @@ router.get("/test", (req, res) => {
 });
 
 router.get("/allusers", GetallUsers);
+router.post("/verify", EmailVerify)
 
 router.get("/get/:id", Getuser);
 
@@ -43,7 +46,9 @@ router.post("/shipping", ShippingAddressCreate);
 router.post("/order", OrderCreate);
 router.post("/payment", PaymentCreate);
 router.put("/payment/:id", PaymentUpdate);
-router.get("/get_order", OrderGet)
+router.get("/get_order", OrderGet);
+router.delete("/user_del/:id", DeleteAllRegisterUsers);
+router.put("/put_user/:id", UpdateUsers)
 
 router.get("/show", (req, res)=>{
   
