@@ -1,5 +1,6 @@
 
 const express = require("express");
+const storeimage  = require("../image");
 const router = express.Router();
 const { Register, Getuser, GetallUsers, CategoryCreate, 
   SubcategoryCreate, ProductCreate, UpdateSubcategory,
@@ -33,7 +34,9 @@ router.post("/payment", PaymentCreate);
 router.put("/payment/:id", PaymentUpdate);
 router.get("/get_order", OrderGet);
 router.delete("/user_del/:id", DeleteAllRegisterUsers);
-router.put("/put_user/:id", UpdateUsers)
+router.put("/put_user/:id", UpdateUsers);
+router.post("/upload", storeimage.single("image"));
+
 router.get("/show", (req, res)=>{
   res.body = { message: "Image sent successfully" };
   res.status(200).json({ message: "Image sent successfully" });
