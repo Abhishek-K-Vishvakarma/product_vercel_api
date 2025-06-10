@@ -7,7 +7,9 @@ const Schema = new mongoose.Schema({
   phone: {type: String, required: true},
   address: {type: String, required: true},
   isVerified: {type: Boolean, enum: [true, false], default: false},
-  gender: {type: String, required: true}
+  gender: {type: String, required: true},
+  resetToken: String,
+  resetTokenExpire: String
 }, {timestamps: true});
 
 module.exports = mongoose.model('User', Schema);

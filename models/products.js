@@ -5,7 +5,6 @@ const productSchema = new mongoose.Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   subcategory_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Subcategory', required: true },
-  quantity: { type: Number, required: true, default: 0 },
   color: { type: String, required: true },
   size: { type: String, required: true }
 }, { timestamps: true });

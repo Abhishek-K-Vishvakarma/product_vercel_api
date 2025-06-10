@@ -1,14 +1,14 @@
-
 const express = require("express");
-const storeimage  = require("../image");
+const upload = require("../image_uploads");
 const router = express.Router();
 const { Register, Getuser, GetallUsers, CategoryCreate, 
   SubcategoryCreate, ProductCreate, UpdateSubcategory,
   getCategory, getSubcategory, getProducts,
-  UpdateProduct, ShippingAddressCreate, OrderCreate,
-  PaymentCreate, PaymentUpdate, OrderGet,
+  UpdateProduct, ShippingAddressCreate,
   UserLogin, EmailVerify, DeleteAllRegisterUsers,
-  UpdateUsers
+  UpdateUsers, Ordercreate, ShippingAddressGet,
+  paymentCreate, OrderGet, PaymentGet, ProductDelete,
+  forgotPassword, resetPassword
  } = require("../logics/logics");
 router.post("/register", Register);
 router.post("/login", UserLogin)
@@ -29,16 +29,19 @@ router.get("/get_subcategory", getSubcategory);
 router.get("/get_product", getProducts);
 router.put("/put_product/:id", UpdateProduct);
 router.post("/shipping", ShippingAddressCreate);
-router.post("/order", OrderCreate);
-router.post("/payment", PaymentCreate);
-router.put("/payment/:id", PaymentUpdate);
-router.get("/get_order", OrderGet);
 router.delete("/user_del/:id", DeleteAllRegisterUsers);
 router.put("/put_user/:id", UpdateUsers);
-router.post("/upload", storeimage.single("image"));
+router.post("/order", Ordercreate);
+router.get("/orderget", OrderGet);
+router.get("/shipget", ShippingAddressGet);
+router.post("/payment", paymentCreate);
+router.get("/payment_get", PaymentGet);
+router.delete("/product_del/:id", ProductDelete);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
-router.get("/show", (req, res)=>{
-  res.body = { message: "Image sent successfully" };
-  res.status(200).json({ message: "Image sent successfully" });
-})
+router.get("/test",(req, res)=>{
+  res.json({ message: "Upload route is working" });
+});
+
 module.exports = router;
