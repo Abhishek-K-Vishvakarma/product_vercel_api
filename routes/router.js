@@ -1,5 +1,4 @@
 const express = require("express");
-const upload = require("../image_uploads");
 const router = express.Router();
 const { Register, Getuser, GetallUsers, CategoryCreate, 
   SubcategoryCreate, ProductCreate, UpdateSubcategory,

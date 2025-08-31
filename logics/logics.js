@@ -387,16 +387,16 @@ const Ordercreate = async (req, res) => {
 
 const OrderGet = async(req, res)=>{
   try{
-   const allOrders = await Order.find({});
-   if(!allOrders) return res.send({message : "Order not found!"});
-   res.send({message : "Getting Order successfully!", order : allOrders});
+  const order = await Order.find();
+  if(!order) return res.status(404).json({message : "Order data not found!"});
+  res.status(200).json({message : "Order is :", order});
   }catch(error){
     res.send("Server error :", {error : error.message});
   }
 }
 
 
-const paymentCreate = async (req, res) => {
+const paymentCreate = async (req, res)=>{
   try {
     const { user_id, order_id, amount, method, status, date } = req.body;
     if (!isValidObjectId(user_id)) return res.status(400).json({ error: "Invalid user ID" });
